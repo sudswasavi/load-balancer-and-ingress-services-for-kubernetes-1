@@ -1164,7 +1164,13 @@ func (rest *RestOperations) VSVipCU(vsvip_nodes []*nodes.AviVSVIPNode, vs_cache_
 						sort.Strings(vsvip_cache_obj.FQDNs)
 						// Cache found. Let's compare the checksums
 						utils.AviLog.Debugf("key: %s, msg: the model FQDNs: %s, cache_FQDNs: %s", key, vsvip.FQDNs, vsvip_cache_obj.FQDNs)
-						if utils.Hash(utils.Stringify(vsvip_cache_obj.FQDNs)) == vsvip.GetCheckSum() {
+						var cacheVSVipChecksum uint32
+						if vsvip.IPAddress != "" && len(vsvip_cache_obj.Vips) > 0 {
+							cacheVSVipChecksum = lib.VSVipChecksum(vsvip_cache_obj.FQDNs, vsvip_cache_obj.Vips[0])
+						} else {
+							cacheVSVipChecksum = lib.VSVipChecksum(vsvip_cache_obj.FQDNs, "")
+						}
+						if cacheVSVipChecksum == vsvip.GetCheckSum() {
 							utils.AviLog.Debugf("key: %s, msg: the checksums are same for VSVIP %s, not doing anything", key, vsvip_cache_obj.Name)
 						} else {
 							// The checksums are different, so it should be a PUT call.

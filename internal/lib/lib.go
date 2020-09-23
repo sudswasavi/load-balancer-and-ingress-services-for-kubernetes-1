@@ -516,6 +516,18 @@ func GetPassthroughShardVSName(s string, key string) string {
 	return vsName
 }
 
+func VSVipChecksum(FQDNs []string, IPAddress string) uint32 {
+	sort.Strings(FQDNs)
+	var checksum uint32
+	if len(FQDNs) != 0 {
+		checksum = utils.Hash(utils.Stringify(FQDNs))
+	}
+	if IPAddress != "" {
+		checksum = checksum + utils.Hash(IPAddress)
+	}
+	return checksum
+}
+
 // GetLabels returns the key value pair used for tagging the segroups and routes in vrfcontext
 func GetLabels() []*models.KeyValue {
 	clusterName := GetClusterName()
